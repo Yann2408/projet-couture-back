@@ -9,6 +9,15 @@ class Inspiration extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'nom'
+    ];
+
     // public function pictures()
     // {
     //     return $this->morphMany(Picture::class, 'support');
