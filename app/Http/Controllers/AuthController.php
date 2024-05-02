@@ -14,7 +14,8 @@ class AuthController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string'],
             'email' => ['required', 'email', 'unique:users'],
-            'password' => ['required']
+            'password' => ['required', 'string']
+            // 'password' => ['required', 'string', 'confirmed']
         ]);
 
         $user = User::create([
@@ -43,11 +44,11 @@ class AuthController extends Controller
 
         if (!$user || !Hash::check($data['password'], $user->password)) {
             return response()->json([
-                'error' => "identifiant ou mot d epasse non valide",
+                'error' => "identifiant ou mot de passe non valide",
             ], 401);
         }
 
-        $token = $user->createToken('auth_token', ['*'])->plainTextToken;
+        $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'access_token' => $token,
