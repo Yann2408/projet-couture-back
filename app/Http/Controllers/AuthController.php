@@ -40,21 +40,29 @@ class AuthController extends Controller
             'password' => ['required']
         ]);
 
-        $user = User::where('email', $data['email'])->first();
+        if (Auth::attempt($data)) {
+            $request->session()->regenerate();
 
-        if (!$user || !Hash::check($data['password'], $user->password)) {
             return response()->json([
-                'error' => "identifiant ou mot de passe non valide",
-            ], 401);
+                'message' => 'Connexion réussie'
+            ]);
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        // $user = User::where('email', $data['email'])->first();
 
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'user' => $user
-        ]);
+        // if (!$user || !Hash::check($data['password'], $user->password)) {
+        //     return response()->json([
+        //         'error' => "identifiant ou mot de passe non valide",
+        //     ], 401);
+        // }
+
+        // $token = $user->createToken('auth_token')->plainTextToken;
+
+        // return response()->json([
+        //     'access_token' => $token,
+        //     'token_type' => 'Bearer',
+        //     'user' => $user
+        // ]);
     }
 
     public function logout(Request $request)
