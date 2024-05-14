@@ -15,7 +15,6 @@ class AuthController extends Controller
             'name' => ['required', 'string'],
             'email' => ['required', 'email', 'unique:users'],
             'password' => ['required', 'string']
-            // 'password' => ['required', 'string', 'confirmed']
         ]);
 
         $user = User::create([
@@ -36,33 +35,25 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $data = $request->validate([
-            'email' => ['required', 'email', 'exists:users'],
-            'password' => ['required']
+            'email'     => ['required', 'email'],
+            'password'  => ['required'],
         ]);
 
-        if (Auth::attempt($data)) {
-            $request->session()->regenerate();
+        $user = User::where('email', $data['email'])->first();
 
+        if (!$user || !Hash::check($data['password'], $user->password)) {
             return response()->json([
-                'message' => 'Connexion réussie'
-            ]);
+                'error' => "identifiant ou mot de passe non valide",
+            ], 401);
         }
 
-        // $user = User::where('email', $data['email'])->first();
+        $token = $user->createToken('auth_token')->plainTextToken;
 
-        // if (!$user || !Hash::check($data['password'], $user->password)) {
-        //     return response()->json([
-        //         'error' => "identifiant ou mot de passe non valide",
-        //     ], 401);
-        // }
-
-        // $token = $user->createToken('auth_token')->plainTextToken;
-
-        // return response()->json([
-        //     'access_token' => $token,
-        //     'token_type' => 'Bearer',
-        //     'user' => $user
-        // ]);
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user
+        ]);
     }
 
     public function logout(Request $request)
